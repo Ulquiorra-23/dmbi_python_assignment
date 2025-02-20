@@ -60,8 +60,8 @@ df_contracts.columns = df_contracts.columns.str.lower()
 df_zipcode.columns = df_zipcode.columns.str.lower()
 
 # listing top 10 zipcodes by contract count
-zipcode_grouped = df_contracts.groupby('zipcode')['contract_id'].count().reset_index()
-zipcode_top =  list(zipcode_grouped.nlargest(10,'contract_id')['zipcode'])
+zipcode_grouped = df_contracts.groupby('zipcode')['contract_id'].count()
+zipcode_top = list(zipcode_grouped[zipcode_grouped > 10].index)
 
 # fetching filtered df for meteo
 # for each record in meteo we will check if the zipcode is among the top 10 before appending them to a dataframe
