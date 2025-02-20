@@ -11,7 +11,7 @@ from sql_tools import write_to_database
 
 # constant variables
 FILENAME = os.path.join(os.getcwd(), 'creds.yaml')
-FINAL_COLS = ['year', 'month', 'zipcode', 'p1_category', 'has_solar', \
+FINAL_COLS = ['year', 'month', 'zipcode', 'p1_category', \
            'temperature_min', 'temperature_max', 'relative_humidity_mean']
 
 # defining dtypes
