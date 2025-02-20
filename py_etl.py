@@ -59,7 +59,7 @@ df_zipcode = pd.read_csv('zipcode_eae_v2.csv', dtype=ZIPCODE_TYPES)
 df_contracts.columns = df_contracts.columns.str.lower()
 df_zipcode.columns = df_zipcode.columns.str.lower()
 
-# listing top 10 zipcodes by contract count
+# listing all zipcodes with more than 10 contracts
 zipcode_grouped = df_contracts.groupby('zipcode')['contract_id'].count()
 zipcode_top = list(zipcode_grouped[zipcode_grouped > 10].index)
 
