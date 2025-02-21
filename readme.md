@@ -22,7 +22,7 @@ c. zipcode_eae_v2.csv
 4. After completion, you should see the new tables in your MySQL Workbench database
 
 ## Optimizations:
-We performed 2 optimizations to imporove memory usage:
+We performed 2 optimizations to improve memory usage:
 
 1. During the transformations, we only keep the relevant columns from the **contracts** and **meteo** tables. This improves performance by ignoring columns not needed for the transformation
 
