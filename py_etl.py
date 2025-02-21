@@ -68,7 +68,7 @@ zipcode_top = list(zipcode_grouped[zipcode_grouped > 10].index)
 # For each record in meteo we will check if the zipcode has >10 contracts
 # The following line does not immediately populate the df
 # The chunksize argument transforms it into an iterator that loads the data into the df once it is processed
-chunks = pd.read_csv('meteo_eae.csv', chunksize = 100000, \
+chunks = pd.read_csv('meteo_eae.csv', chunksize = 100000, delimiter=';', \
                         dtype = METEO_TYPES, parse_dates= ['date'])
 
 # Now we are processing the chunks and concatenating them only with zipcodes associated with >10 contracts
@@ -84,7 +84,7 @@ df_contracts['p1_category'] = df_contracts['power_p1'].apply(lambda x: _category
 df_contracts_zero_raw = df_contracts[df_contracts['client_type_id']==0]
 
 # Removing unnecessary columns before creating the joint table of meteo and contracts
-df_contracts_zero = df_contracts_zero_raw[['p1_category','zipcode','has_solar','has_solar']]
+df_contracts_zero = df_contracts_zero_raw[['p1_category','zipcode','has_solar']]
 df_meteo_top = df_meteo_top_raw[['date','temperature','relative_humidity','zipcode']]
 
 # Performing the required right join on zipcode between df_meteo_top and df_contracts_zero
@@ -118,3 +118,5 @@ solar_indicators_no_solar = df_solar_indicators_raw[df_solar_indicators_raw['has
 # change order of final columns
 # write into database
 # one more column n - ask roger
+
+# put functions (Massi)

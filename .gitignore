@@ -1,3 +1,4 @@
 *.csv
 .yaml
 .pdf
+__pycache__
