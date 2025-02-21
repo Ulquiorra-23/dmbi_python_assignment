@@ -1,7 +1,7 @@
 # Python ETL - Group Project
 
 ## Python ETL:
-Automatically pull data from .csv files, apply standardized transformations, and upload the processes data to a MySQL Workbench database.
+Automatically pull data from .csv files, apply standardized transformations, and upload the processed data to a MySQL Workbench database.
 
 ## Group members:
 [Juan Jose Montesinos](https://www.linkedin.com/in/jmont90/)\
