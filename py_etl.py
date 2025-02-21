@@ -1,21 +1,21 @@
-# std libs
+# Importing standard libraries
 import os
 
-# third party libs
+# Importing third party libraries
 import yaml
 import pandas as pd
 
-# custom libs
+# Importing custom libraries
 from sql_tools import write_to_database
 
 
-# constant variables
+# Defining the constant variables 
 FILENAME = os.path.join(os.getcwd(), 'creds.yaml')
 FINAL_COLS = ['year', 'month', 'zipcode', 'p1_category', \
            'temperature_min', 'temperature_max', 'relative_humidity_mean']
 
-# defining dtypes
-
+# Defining the data types for the .csv files
+# Note: Changing the has_solar dtype in the contracts table from int to bool for later classification use  
 METEO_TYPES = {'temperature':'float64','relative_humidity':'float64',
                'precipitation_rate':'float64','wind_speed':'float64',
                'zipcode':'str'}
@@ -26,12 +26,12 @@ ZIPCODE_TYPES = {'ZIPCODE':'str','ZC_LATITUDE':'float64',
                  'ZC_LONGITUDE':'float64','AUTONOMOUS_COMMUNITY':'str',
                  'AUTONOMOUS_COMMUNITY_NK':'str','PROVINCE':'str'}
 
-# accessing DB credentials
+# Accessing the database credentials for MySQL Workbench
 with open(FILENAME, "r") as file:
     creds = yaml.safe_load(file)
     
-# helpers
-# defining filtering condition function that will be used to store only relevant meteo records in memory
+# Helpers
+# Defining a filtering condition function that will be used to store only relevant meteo records in memory
 def _filter_data_isin(table: str, column: str, lookup: list):
     '''
     Arg:
@@ -41,7 +41,7 @@ def _filter_data_isin(table: str, column: str, lookup: list):
     '''
     return table[table[column].isin(lookup)]
 
-# defining a function to categorize p1_power column
+# Defining a function to categorize p1_power column in the contracts table
 def _category_p(power: float) -> str:
     if power >= 5000:
         return 'Over 5 MW'
@@ -51,64 +51,70 @@ def _category_p(power: float) -> str:
         return 'Between 3 and 5 MW'
 
 
-# creating dataframes from csv files skipping the meteo one for now
+# Creating dataframes from csv files 
+# The meteo file will be loaded later 
 df_contracts = pd.read_csv('contracts_eae.csv', dtype=CONTRACT_TYPES)
 df_zipcode = pd.read_csv('zipcode_eae_v2.csv', dtype=ZIPCODE_TYPES)
 
-# normalizing column names in lowercase
+# Normalizing column names in lowercase 
 df_contracts.columns = df_contracts.columns.str.lower()
 df_zipcode.columns = df_zipcode.columns.str.lower()
 
-# listing all zipcodes with more than 10 contracts
+# Identifying all zipcodes with more than 10 contracts
 zipcode_grouped = df_contracts.groupby('zipcode')['contract_id'].count()
 zipcode_top = list(zipcode_grouped[zipcode_grouped > 10].index)
 
-# fetching filtered df for meteo
-# for each record in meteo we will check if the zipcode is among the top 10 before appending them to a dataframe
-# the following line does not really populate the df
-# the chunksize argument transforms it into an iterator that loads once it is processed
+# Fetching filtered df for meteo_eae.csv
+# For each record in meteo we will check if the zipcode has >10 contracts
+# The following line does not immediately populate the df
+# The chunksize argument transforms it into an iterator that loads the data into the df once it is processed
 chunks = pd.read_csv('meteo_eae.csv', chunksize = 100000, \
                         dtype = METEO_TYPES, parse_dates= ['date'])
 
-# now we are processing the chunks and concatenating them only with filtered values
-# all not necessary values are destroyed after the following line is processed
+# Now we are processing the chunks and concatenating them only with zipcodes associated with >10 contracts
+# All not unnecessary values are destroyed after the following line is processed
 df_meteo_top_raw = pd.concat([_filter_data_isin(table=chunk, \
                             column='zipcode',lookup=zipcode_top) \
                             for chunk in chunks], ignore_index=True)
 
-# creating p1 category as required
+# Applying the helper function _category_p() to the contracts df to classify power usage 
 df_contracts['p1_category'] = df_contracts['power_p1'].apply(lambda x: _category_p(x))
 
-# filtering out client type 0
+# Keeping only clients with client_type == 0 in the contracts df
 df_contracts_zero_raw = df_contracts[df_contracts['client_type_id']==0]
 
-# removing unnecessary columns befor creating the joint table
+# Removing unnecessary columns before creating the joint table of meteo and contracts
 df_contracts_zero = df_contracts_zero_raw[['p1_category','zipcode','has_solar','has_solar']]
 df_meteo_top = df_meteo_top_raw[['date','temperature','relative_humidity','zipcode']]
 
-# performing the required join
+# Performing the required right join on zipcode between df_meteo_top and df_contracts_zero
 df_solar_indicators_raw = df_contracts_zero.merge(df_meteo_top, how='right', \
                                                             left_on='zipcode', right_on='zipcode')
 
-# adding required columns of month and year and removing the date
+# Separating the date column into 2 columns: year and month
+# Removing the now obsolete date column 
 df_solar_indicators_raw['year'] = df_solar_indicators_raw['date'].dt.strftime("%Y")
 df_solar_indicators_raw['month'] = df_solar_indicators_raw['date'].dt.strftime("%B")
 df_solar_indicators_raw = df_solar_indicators_raw.drop(columns='date')
 
-# performing the groupby
+# Performing the groupby to generate max temp, min temp, and avg relative humidity 
 df_solar_indicators_raw = df_solar_indicators_raw.groupby(['year','month','zipcode','p1_category','has_solar']).agg( \
                                 {'temperature':['min', 'max'],'relative_humidity':'mean'} \
                                 ).reset_index()
 
-# flattening the multi_index generated by the groupby
+# Flattening the multi_index generated by the groupby in order to prepare for loading df into MySQL Workbench 
 df_solar_indicators_raw.columns = ['_'.join(col).strip('_') for col in df_solar_indicators_raw.columns]
 
-# finalizing the dataframes by solar/nosolar contracts for sql loading
+# Creating two df by splitting df_solar_indicators_raw into contracts with and without solar
 solar_indicators_with_solar = df_solar_indicators_raw[df_solar_indicators_raw['has_solar']==True][FINAL_COLS]
 solar_indicators_no_solar = df_solar_indicators_raw[df_solar_indicators_raw['has_solar']==False][FINAL_COLS]
+
+
+# Loading the two df into MySQL Workbench
+
+
 
 
 # change order of final columns
 # write into database
 # one more column n - ask roger
-# add better comments
