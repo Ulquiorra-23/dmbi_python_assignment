@@ -1,14 +1,15 @@
-#std libs
+# Importing standard libraries
 import os
 
-#third party libs
+# Importing third party libraries
 import pandas as pd
+import yaml 
 from sqlalchemy import create_engine
 
-#VARIABLES
+# Declaring constant variable 
 FILENAME = os.path.join(os.getcwd(), 'creds.yaml')
 
-
+# Read credentials from the cred.yaml file 
 with open(FILENAME, "r") as file:
     creds = yaml.safe_load(file)
 
