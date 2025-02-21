@@ -106,3 +106,9 @@ df_solar_indicators_raw.columns = ['_'.join(col).strip('_') for col in df_solar_
 # finalizing the dataframes by solar/nosolar contracts for sql loading
 solar_indicators_with_solar = df_solar_indicators_raw[df_solar_indicators_raw['has_solar']==True][FINAL_COLS]
 solar_indicators_no_solar = df_solar_indicators_raw[df_solar_indicators_raw['has_solar']==False][FINAL_COLS]
+
+
+# change order of final columns
+# write into database
+# one more column n - ask roger
+# add better comments
