@@ -112,9 +112,9 @@ solar_indicators_no_solar = df_solar_indicators_raw[df_solar_indicators_raw['has
 
 # Loading the two df into MySQL Workbench
 
-write_to_database(creds=creds['mysql-db'], df=solar_indicators_with_solar, table_name='solar_indicators_with_solar', if_exists='replace')
+write_to_database(creds=creds['mysql-db'], df=solar_indicators_with_solar, table_name='solar_indicators_with_solar_ft', if_exists='replace')
 
-write_to_database(creds=creds['mysql-db'], df=solar_indicators_no_solar, table_name='solar_indicators_no_solar', if_exists='replace')
+write_to_database(creds=creds['mysql-db'], df=solar_indicators_no_solar, table_name='solar_indicators_no_solar_ft', if_exists='replace')
 
 
 
