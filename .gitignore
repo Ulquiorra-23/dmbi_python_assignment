@@ -1,5 +1,6 @@
 *.csv
-.yaml
+*.yaml
+*.yml
 .pdf
 __pycache__
 .ipynb
