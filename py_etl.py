@@ -11,8 +11,8 @@ from sql_tools import write_to_database
 
 # Defining the constant variables 
 FILENAME = os.path.join(os.getcwd(), 'creds.yaml')
-FINAL_COLS = ['year', 'month', 'zipcode', 'p1_category', \
-           'temperature_min', 'temperature_max', 'relative_humidity_mean']
+FINAL_COLS = ['zipcode' , 'year', 'month', 'p1_category', \
+           'temperature_max', 'temperature_min', 'relative_humidity_mean']
 
 # Defining the data types for the .csv files
 # Note: Changing the has_solar dtype in the contracts table from int to bool for later classification use  
