@@ -1,5 +1,5 @@
 mysql-db:
   database: kettle_lab
   host: localhost
-  password: snake
-  username: snake
+  password: whatever
+  username: root
