@@ -17,7 +17,7 @@ a. contracts_eae.csv\
 b. meteo_eae.csv\
 c. zipcode_eae_v2.csv
 
-3. Run the *py_etl.py* file to perform the ETL process
+3. Run the *meteo_etl.py* file to perform the ETL process
 
 4. After completion, you should see the new tables in your MySQL Workbench database
 
